@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/L4.dir/client.cpp.o CMakeFiles/L4.dir/server.cpp.o CMakeFiles/L4.dir/client_delete.cpp.o  -o L4 
