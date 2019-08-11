@@ -12,6 +12,19 @@
 
 #define PROTOCOL 200
 
+int recvfrom_addr(int socketfd, char *buffer, int buffer_len, int flags, struct sockaddr_in dest_addr, socklen_t socklen) {
+
+    struct sockaddr_in addr;
+    addr.sin_addr.s_addr = 0;
+
+    int len = 0;
+    while (addr.sin_addr.s_addr != dest_addr.sin_addr.s_addr) {
+        len = recvfrom(socketfd, buffer, buffer_len, flags, (struct sockaddr *)&addr, &socklen);
+    }
+
+    return len;
+}
+
 int main(int argc, char **argv) {
 
     // create L4 socket
@@ -41,11 +54,11 @@ int main(int argc, char **argv) {
     }
 
     // OPTIONAL: bind socket to specific interface
-    const char *interface = "enp2s0";
-    if (setsockopt(socketfd, SOL_SOCKET, SO_BINDTODEVICE, interface, 6) < 0) {
-        printf("setsockopt failed\n");
-        exit(EXIT_FAILURE);
-    }
+//    const char *interface = "enp2s0";
+//    if (setsockopt(socketfd, SOL_SOCKET, SO_BINDTODEVICE, interface, 6) < 0) {
+//        printf("setsockopt failed\n");
+//        exit(EXIT_FAILURE);
+//    }
 
     // declare and populate buffer
     char *buffer = (char *)malloc(1024 * sizeof(char));
@@ -64,16 +77,12 @@ int main(int argc, char **argv) {
     }
 
     socklen_t addr_len = sizeof(dest_addr);
-
-    int len = recvfrom(socketfd, buffer, 1024, 0, (struct sockaddr *)&dest_addr,
-             (socklen_t *)&addr_len);
+    int len = recvfrom_addr(socketfd, buffer, 1024, 0, dest_addr, addr_len);
     if (len < 0) {
         perror("recvfrom failed");
     } else {
         printf("%d bytes received: ", len);
-        for (int i = 0; i < len; ++i) {
-            printf("%c", buffer[i]);
-        }
+        printf("%s\n", buffer + 20);
         printf("\n");
     }
 
